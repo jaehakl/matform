@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='matform',
-    version='0.1.2',
+    version='0.1.3',
     description='Matrix transform library written by Jaehak Lee',
     author='Jaehak Lee',
     author_email='leejaehak87@gmail.com',

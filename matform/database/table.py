@@ -18,7 +18,7 @@ class Table():
             sql += column_sql+","            
         sql = sql[:-1]
         sql += ")"
-        self.db._commit(sql)    
+        self.db._commit(sql)
 
     def delete(self):
         table_name = self.table_name
@@ -33,7 +33,14 @@ class Table():
                 return df
             else:
                 return pd.DataFrame()
-            
+
+    def insert(self,values):
+        table_name = self.table_name        
+        table_columns = values.keys()
+        query = "INSERT INTO " + table_name +" ("+",".join(table_columns)+") VALUES ('"+"','".join(values.values())+"')"
+        self.db._commit(query)
+
+
     def set(self,df):
         table_name = self.table_name
         for ref_column in self.db._get("PRAGMA foreign_key_list("+table_name+")"):
