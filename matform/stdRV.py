@@ -8,6 +8,7 @@ import io
 #Third-party modules
 import numpy as np
 import pandas as pd
+from .array.labeledTensor import LabeledTensor
 
 #Custom modules
 class StdRV():
@@ -34,6 +35,8 @@ class StdRV():
 			rv = StdRV.encodeDataFrame(var)
 		elif varType == "ndarray":
 			rv = StdRV.encodeNdarray(var)
+		elif varType == "LabeledTensor":
+			rv = StdRV.encodeLabeledTensor(var)
 		else:
 			print(var, varType)
 			rv = None
@@ -85,6 +88,10 @@ class StdRV():
 			  "dtype":str(dtype.name)}
 		return rv
 
+	def encodeLabeledTensor(lt_var):
+		rv = {"type":"LabeledTensor","value":lt_var.to_b64_np_dict()}
+		return rv
+
 	def decode(json_var):
 		var = json.loads(json_var)
 		return StdRV.decodeElement(var)
@@ -109,6 +116,8 @@ class StdRV():
 			rv = StdRV.decodeDataFrame(var)
 		elif varType == "ndarray":
 			rv = StdRV.decodeNdarray(var)
+		elif varType == "LabeledTensor":
+			rv = StdRV.decodeLabeledTensor(var)
 		else:
 			print(var, varType)
 			rv = None
@@ -172,3 +181,7 @@ class StdRV():
 		
 		arr = s.reshape(*shape)
 		return arr
+	
+	def decodeLabeledTensor(var):
+		lt = LabeledTensor.from_b64_np_dict(var["value"])
+		return lt

@@ -1,4 +1,5 @@
 # Copyright (C) 2024 Jaehak Lee
+import base64
 import numpy as np
 
 class LabeledTensor(object):
@@ -53,6 +54,43 @@ class LabeledTensor(object):
         else:
             label_names = ["axis"+str(i) for i in range(len(data.shape))]
         return LabeledTensor(data, labels, label_names)
+    
+    def to_b64_np_dict(self):
+        dtype = self.data.dtype        
+        array = np.ascontiguousarray(self.data).astype(dtype)
+        b64_str_value = base64.b64encode(array).decode('ascii')
+        b64_ndarray = {
+            "value": b64_str_value,
+            "shape": array.shape,
+            "dtype": str(dtype.name)             
+        }
+        return {"data": b64_ndarray, "labels": self.labels, "label_names": self.label_names}
+    
+    def from_b64_np_dict(data_dict):
+        b64_ndarray = data_dict["data"]
+        b64_str_value = b64_ndarray["value"]
+        shape = b64_ndarray["shape"]
+        dtype_name = b64_ndarray["dtype"]
+
+        if dtype_name == "float":
+            dtype = float
+        elif dtype_name == "float64":
+            dtype = np.float64
+        elif dtype_name == "complex":
+            dtype = complex
+        elif dtype_name == "complex128":
+            dtype = np.complex128
+        else:
+            print(dtype_name, "is not supported")
+            return None
+
+        s = np.frombuffer(
+            base64.decodebytes(b64_str_value.encode('ascii')),
+            dtype=dtype)
+        
+        ndarray = s.reshape(*shape)
+        return LabeledTensor(ndarray, data_dict["labels"], data_dict["label_names"])
+
 
     def to_json_dict(self):
         data_list = self.data.tolist()

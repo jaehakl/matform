@@ -1,6 +1,6 @@
 # Copyright (C) 2024 Jaehak Lee
 
-__version__='0.1.3'
+__version__='0.1.4'
 
 from . import database
 
