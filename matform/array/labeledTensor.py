@@ -1,5 +1,5 @@
 # Copyright (C) 2024 Jaehak Lee
-import base64
+import base64, json
 import numpy as np
 
 class LabeledTensor(object):
@@ -64,7 +64,24 @@ class LabeledTensor(object):
             "shape": array.shape,
             "dtype": str(dtype.name)             
         }
-        return {"data": b64_ndarray, "labels": self.labels, "label_names": self.label_names}
+        labels_stdRV = []
+        for label in self.labels:
+            label_stdRV = []
+            for var in label:
+                varType = type(var).__name__
+                if varType in ["int","int64"]:
+                    rv = {"type":"int","value":str(var)}
+                elif varType in ["float","float64"]:
+                    rv = {"type":"float","value":str(float(var))}
+                elif varType == "str":
+                    rv = {"type":"str","value":var}
+                else:
+                    print(var, varType)
+                    rv = None
+                label_stdRV.append(rv)
+            labels_stdRV.append(label_stdRV)
+
+        return {"data": b64_ndarray, "labels": labels_stdRV, "label_names": self.label_names}
     
     def from_b64_np_dict(data_dict):
         b64_ndarray = data_dict["data"]
@@ -89,7 +106,23 @@ class LabeledTensor(object):
             dtype=dtype)
         
         ndarray = s.reshape(*shape)
-        return LabeledTensor(ndarray, data_dict["labels"], data_dict["label_names"])
+
+        labels = []
+        for label_stdRV in data_dict["labels"]:
+            label = []
+            for var_strRV in label_stdRV:
+                if var_strRV["type"] == "int":
+                    label.append(int(var_strRV["value"]))
+                elif var_strRV["type"] == "float":
+                    label.append(float(var_strRV["value"]))
+                elif var_strRV["type"] == "str":
+                    label.append(var_strRV["value"])
+                else:
+                    print(var_strRV, var_strRV["type"])
+            labels.append(label)            
+        print(labels)
+
+        return LabeledTensor(ndarray, labels, data_dict["label_names"])
 
 
     def to_json_dict(self):
