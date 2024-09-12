@@ -9,7 +9,7 @@ class LabeledTensor(object):
         elif type(data).__name__ in ["int","float","complex"]:
             data = np.array([data])
         else:
-            data = np.array(data)      
+            data = np.array(data)
         self.data = data
         if labels:
             self.labels = labels
@@ -18,11 +18,11 @@ class LabeledTensor(object):
         if label_names:
             self.label_names = label_names
         else:
-            self.label_names = ["axis"+str(i) for i in range(len(self.data.shape))]            
+            self.label_names = ["axis"+str(i) for i in range(len(self.data.shape))]
     
     def to_chart_data(self):
         if len(self.data.shape) == 1:
-            data_dict = {"x":self.labels[0], "y":self.data}            
+            data_dict = {"x":self.labels[0], "y":self.data}
             return data_dict, *self.label_names
         else:
             print(self.data, self.data.shape)
@@ -56,13 +56,13 @@ class LabeledTensor(object):
         return LabeledTensor(data, labels, label_names)
     
     def to_b64_np_dict(self):
-        dtype = self.data.dtype        
+        dtype = self.data.dtype
         array = np.ascontiguousarray(self.data).astype(dtype)
         b64_str_value = base64.b64encode(array).decode('ascii')
         b64_ndarray = {
             "value": b64_str_value,
             "shape": array.shape,
-            "dtype": str(dtype.name)             
+            "dtype": str(dtype.name)
         }
         labels_stdRV = []
         for label in self.labels:

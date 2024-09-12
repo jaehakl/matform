@@ -40,6 +40,7 @@ VARS_STRUCTURE ={
 
 def eval_structure(structures_df, components_df, array_axis=np.eye(3), address = "", array_dicts_init = None,
                    parent_size=None, parent_props=None, parent_material=None, parsed=False):
+
     entity_list = []
     if array_dicts_init == None:
         array_dicts = {}
@@ -59,13 +60,12 @@ def eval_structure(structures_df, components_df, array_axis=np.eye(3), address =
 
         n_array = array_dict['array'][0]
         size_array = array_dict['array'][1]
-
         for i_x in range(int(n_array[0])):
             for i_y in range(int(n_array[1])):
                 for i_z in range(int(n_array[2])):
                     element_address = component_address + "(" + str(i_x) + "," + str(i_y) + "," + str(i_z) + ")"
                     
-                    element_dict = {
+                    element_dict = copy.deepcopy({
                         'component': array_dict['component'],
                         'component_id': array_dict['component_id'],
                         'array': array_dict['array'],
@@ -75,13 +75,12 @@ def eval_structure(structures_df, components_df, array_axis=np.eye(3), address =
                         'size': array_dict['size'][i_x][i_y][i_z],
                         'props': array_dict['props'][i_x][i_y][i_z],
                         'material': array_dict['material'][i_x][i_y][i_z],
-                    }
-
-                    element_dict['position'][0] = list(np.array(element_dict['position'][0])
+                    })
+                    element_dict['position'][0] = (np.array(element_dict['position'][0])
                         +np.matmul(array_axis,np.array([i_x-(n_array[0]-1)/2,
                                    i_y-(n_array[1]-1)/2,
                                    i_z-(n_array[2]-1)/2])*np.array(size_array))
-                        )
+                        ).tolist()
                     if element_dict['component'] in ['sphere','ellipsoid','cone','block','region','region_func','so_revol_func']:
                         entity_list.append(element_dict)
         
@@ -92,7 +91,7 @@ def eval_structure(structures_df, components_df, array_axis=np.eye(3), address =
                             element_dict['size'][0], element_dict['props'], element_dict['material'][0], parsed=True)
                                            
                         for entity in entity_list_partial:
-                            entity['position'][0] = list(np.array(element_dict['position'][0])+ np.matmul(element_axis,entity['position'][0]))
+                            entity['position'][0] = (np.array(element_dict['position'][0])+ np.matmul(element_axis,entity['position'][0])).tolist()
                             entity['rotation'] = entity['rotation'] +  element_dict['rotation']
                             entity_list.append(entity)
 
