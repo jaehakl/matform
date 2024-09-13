@@ -166,7 +166,8 @@ class ServerAPI(socketserver.BaseRequestHandler):
                 data = self.__recieveSeg(size)
         else:
             data=None
-        return StdRV.decode(data)
+        rv = StdRV.decode(data)
+        return rv
 
     def __sendObj(self, data):
         totalData = StdRV.encode(data)

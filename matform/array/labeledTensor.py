@@ -120,7 +120,6 @@ class LabeledTensor(object):
                 else:
                     print(var_strRV, var_strRV["type"])
             labels.append(label)            
-        print(labels)
 
         return LabeledTensor(ndarray, labels, data_dict["label_names"])
 
